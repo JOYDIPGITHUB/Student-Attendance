@@ -1,0 +1,23 @@
+.app-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #2196f3;
+    color: white;
+    text-align: center;
+    padding:  0px;
+    font-size: 0.9rem;
+    z-index: 1000;
+   
+  }
+  
+  .app-footer a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .app-footer a:hover {
+    text-decoration: underline;
+  }

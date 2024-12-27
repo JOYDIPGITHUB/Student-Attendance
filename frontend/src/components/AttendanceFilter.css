@@ -1,0 +1,49 @@
+.attendance-filter {
+    margin: 20px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .attendance-filter form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .attendance-filter input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .attendance-filter button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .attendance-filter button:hover {
+    background-color: #0056b3;
+  }
+  
+  .attendance-list h3 {
+    margin-top: 20px;
+  }
+  
+  .attendance-list ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .attendance-list li {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }

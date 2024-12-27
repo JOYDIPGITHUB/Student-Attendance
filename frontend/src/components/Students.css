@@ -1,0 +1,113 @@
+/* students.css */
+
+/* General Container Styling */
+div {
+    font-family: 'Arial', sans-serif;
+    margin: 0 auto;
+    padding: 20px;
+    max-width: 600px;
+    background-color: #f4f7fc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    text-align: center;
+    color: #3b3b3b;
+    margin-bottom: 20px;
+    font-size: 28px;
+  }
+  
+  h3 {
+    color: #4a4a4a;
+    font-size: 22px;
+    margin-top: 30px;
+  }
+  
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  li {
+    background-color: #ffffff;
+    margin: 8px 0;
+    padding: 12px;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+    font-size: 16px;
+  }
+  
+  li:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+  }
+  
+  /* Input Fields */
+  input[type='text'] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+  }
+  
+  input[type='text']:focus {
+    border-color: #4a90e2;
+    outline: none;
+  }
+  
+  input[type='text']::placeholder {
+    color: #888;
+  }
+  
+  /* Button Styling */
+  button {
+    background-color: #4a90e2;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #357ab7;
+  }
+  
+  button:active {
+    background-color: #2c5a8c;
+  }
+  
+  button:disabled {
+    background-color: #d3d3d3;
+    cursor: not-allowed;
+  }
+  
+  /* Responsiveness */
+  @media (max-width: 768px) {
+    div {
+      padding: 15px;
+    }
+  
+    h2 {
+      font-size: 24px;
+    }
+  
+    h3 {
+      font-size: 20px;
+    }
+  
+    input[type='text'] {
+      font-size: 14px;
+    }
+  
+    button {
+      font-size: 14px;
+    }
+  }
