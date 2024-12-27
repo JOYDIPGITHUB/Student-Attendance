@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: `${process.env.BACKEND_URI}/api`,// Proxy base URL in development
+  baseURL: 'https://attendance-wthe.onrender.com/api',// Proxy base URL in development
 });
 export const register = (userData) => API.post('/users/register', userData);
 export const login = (credentials) => API.post('/auth/login', credentials);
