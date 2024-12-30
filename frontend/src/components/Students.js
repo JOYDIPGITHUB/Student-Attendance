@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { fetchStudents, addStudent,deleteStudent } from '../services/api';
+import { fetchStudents, addStudent,deleteStudent,updateStudent } from '../services/api';
 import './Students.css';
 
 const Students = () => {
@@ -8,6 +8,8 @@ const Students = () => {
   const [name, setName] = useState('');
   const [rollNumber, setRollNumber] = useState('');
   const [studentClass, setStudentClass] = useState('');
+  const [editing, setEditing] = useState(false); // Track editing state
+  const [editId, setEditId] = useState(null); // Store the ID of the student being edited
 
   useEffect(() => {
     const getStudents = async () => {
@@ -44,17 +46,48 @@ const Students = () => {
     }
   };
 
+  // Start editing a student record
+  const handleEditStudent = (student) => {
+    setEditing(true);
+    setEditId(student._id);
+    setName(student.name);
+    setRollNumber(student.rollNumber);
+    setStudentClass(student.class);
+  };
+
+  // Save edited student record
+  const handleSaveEdit = async () => {
+    try {
+      const updatedStudent = { name, rollNumber, class: studentClass };
+      await updateStudent(editId, updatedStudent);
+      setStudents(
+        students.map((student) =>
+          student._id === editId ? { ...student, ...updatedStudent } : student
+        )
+      );
+      setEditing(false);
+      setEditId(null);
+      setName('');
+      setRollNumber('');
+      setStudentClass('');
+      toast.success('Student Record updated successfully');
+    } catch (err) {
+      toast.error('Failed to update student!');
+    }
+  };
+
   return (
     <div>
       <h2>Students</h2>
       <ul>
         {students.map((student) => (
           <li key={student.rollNumber}>{student.rollNumber} - {student.name} - {student.class}
+          <button onClick={() => handleEditStudent(student)}>Edit</button>
           <button onClick={() => handleDeleteStudent(student._id)}>Delete</button>
           </li>
         ))}
       </ul>
-      <h3>Add Student</h3>
+      <h3>{editing ? 'Edit Student' : 'Add Student'}</h3>
       <input
         type="text"
         placeholder="Name"
@@ -73,7 +106,11 @@ const Students = () => {
         value={studentClass}
         onChange={(e) => setStudentClass(e.target.value)}
       />
-      <button onClick={handleAddStudent}>Add Student</button>
+      {editing ? (
+        <button onClick={handleSaveEdit}>Save</button>
+      ) : (
+        <button onClick={handleAddStudent}>Add Student</button>
+      )}
     </div>
   );
 };
