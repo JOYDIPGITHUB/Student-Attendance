@@ -1,59 +1,102 @@
-import React, { useState } from 'react';
-import { filterAttendance } from '../services/api'; // Import the API service
-import './AttendanceFilter.css'; // Optional for styling
+import React, { useState, useEffect } from 'react';
+import { filterAttendance, fetchStudentNames } from '../services/api';
+import jsPDF from 'jspdf'; // Import jsPDF
+import 'jspdf-autotable'; // Import autoTable plugin
+import './AttendanceFilter.css';
 
 const AttendanceFilter = () => {
   const [year, setYear] = useState('');
   const [month, setMonth] = useState('');
   const [attendanceRecords, setAttendanceRecords] = useState([]);
+  const [students, setStudents] = useState([]);
+  const [selectedStudent, setSelectedStudent] = useState('');
 
-  const months = [
-    { value: 1, label: 'January' },
-    { value: 2, label: 'February' },
-    { value: 3, label: 'March' },
-    { value: 4, label: 'April' },
-    { value: 5, label: 'May' },
-    { value: 6, label: 'June' },
-    { value: 7, label: 'July' },
-    { value: 8, label: 'August' },
-    { value: 9, label: 'September' },
-    { value: 10, label: 'October' },
-    { value: 11, label: 'November' },
-    { value: 12, label: 'December' },
-  ];
+  useEffect(() => {
+    // Fetch student names for the dropdown
+    const getStudentNames = async () => {
+      const response = await fetchStudentNames();
+      setStudents(response.data);
+    };
+    getStudentNames();
+  }, []);
 
-  const handleSubmit = async (e) => {
+  const handleViewAttendance = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await filterAttendance({ year, month });
-      setAttendanceRecords(response.data);
+      const params = {
+        year: year || undefined,
+        month: month || undefined,
+        name: selectedStudent || undefined,
+      };
+
+      const response = await filterAttendance(params);
+      setAttendanceRecords(Array.isArray(response.data) ? response.data : [response.data]);
     } catch (err) {
       console.error('Error fetching attendance:', err.message);
       alert('Failed to fetch attendance. Please try again.');
     }
   };
 
+  const handleGeneratePDF = () => {
+    const doc = new jsPDF();
+    const tableColumn = ['Name', 'Roll Number', 'Class', 'Date', 'Time', 'Status'];
+    const tableRows = [];
+
+    attendanceRecords.forEach((record) => {
+      record.attendance.forEach((att) => {
+        const date = new Date(att.date);
+        const formattedDate = date.toLocaleDateString();
+        const formattedTime = date.toLocaleTimeString();
+
+        tableRows.push([
+          record.name,
+          record.rollNumber,
+          record.class,
+          formattedDate,
+          formattedTime,
+          att.status,
+        ]);
+      });
+    });
+
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+    });
+
+    doc.save(`Attendance_${year}_${month}.pdf`);
+  };
+
   return (
     <div className="attendance-filter">
       <h2>View Attendance</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleViewAttendance}>
+        <select
+          value={selectedStudent}
+          onChange={(e) => setSelectedStudent(e.target.value)}
+        >
+          <option value="">All Students</option>
+          {students.map((student) => (
+            <option key={student._id} value={student.name}>
+              {student.name}
+            </option>
+          ))}
+        </select>
         <input
           type="number"
           placeholder="Year (e.g., 2024)"
           value={year}
           onChange={(e) => setYear(e.target.value)}
-          required
         />
-       <select
+        <select
           value={month}
           onChange={(e) => setMonth(e.target.value)}
-          required
         >
           <option value="">Select Month</option>
-          {months.map((m) => (
-            <option key={m.value} value={m.value}>
-              {m.label}
+          {Array.from({ length: 12 }, (_, i) => (
+            <option key={i + 1} value={i + 1}>
+              {new Date(0, i).toLocaleString('default', { month: 'long' })}
             </option>
           ))}
         </select>
@@ -70,13 +113,14 @@ const AttendanceFilter = () => {
                 <ul>
                   {record.attendance.map((att, index) => (
                     <li key={index}>
-                      Date: {new Date(att.date).toLocaleDateString()} - Status: {att.status}
+                      Date: {new Date(att.date).toLocaleDateString()} - Time: {new Date(att.date).toLocaleTimeString()} - Status: {att.status}
                     </li>
                   ))}
                 </ul>
               </li>
             ))}
           </ul>
+          <button onClick={handleGeneratePDF}>Generate PDF</button>
         </div>
       )}
     </div>
