@@ -3,54 +3,70 @@ const router = express.Router();
 const Student = require('../models/Student'); // Import Student model
 
 
-// Get attendance records for a specific year and month
-router.get('/', async (req, res) => {
-  const { year, month } = req.query;
-
-  // Validate query parameters
-  if (!year || !month) {
-    return res.status(400).json({ message: 'Year and month are required.' });
-  }
+// Get attendance records with optional filtering by student name, year, and month
+router.get('/filter', async (req, res) => {
+  const { name, year, month } = req.query;
 
   try {
-    // Fetch all students
-    const students = await Student.find();
+    if (name) {
+      // Fetch attendance for a specific student
+      const student = await Student.findOne({ name });
+      if (!student) {
+        return res.status(404).json({ message: 'Student not found.' });
+      }
 
-    // Filter attendance for each student
-    const filteredAttendance = students.map((student) => {
-      // Check if student has an attendance array
-      if (!student.attendance || !Array.isArray(student.attendance)) {
+      const filteredAttendance = student.attendance.filter((record) => {
+        const recordDate = new Date(record.date);
+        return (
+          (!year || recordDate.getFullYear() === parseInt(year, 10)) &&
+          (!month || recordDate.getMonth() + 1 === parseInt(month, 10))
+        );
+      });
+
+      return res.json({
+        studentId: student._id,
+        name: student.name,
+        rollNumber: student.rollNumber,
+        class: student.class,
+        attendance: filteredAttendance,
+      });
+    } else {
+      // Fetch attendance for all students
+      const students = await Student.find();
+
+      const filteredAttendance = students.map((student) => {
+        const attendance = student.attendance.filter((record) => {
+          const recordDate = new Date(record.date);
+          return (
+            (!year || recordDate.getFullYear() === parseInt(year, 10)) &&
+            (!month || recordDate.getMonth() + 1 === parseInt(month, 10))
+          );
+        });
+
         return {
           studentId: student._id,
           name: student.name,
           rollNumber: student.rollNumber,
           class: student.class,
-          attendance: [], // Return an empty array if attendance is not available
+          attendance,
         };
-      }
-
-      // Filter attendance records based on year and month
-      const attendance = student.attendance.filter((record) => {
-        const recordDate = new Date(record.date);
-        return (
-          recordDate.getFullYear() === parseInt(year, 10) &&
-          recordDate.getMonth() + 1 === parseInt(month, 10)
-        );
       });
 
-      // Return the filtered data
-      return {
-        studentId: student._id,
-        name: student.name,
-        rollNumber: student.rollNumber,
-        class: student.class,
-        attendance,
-      };
-    });
-
-    res.json(filteredAttendance);
+      return res.json(filteredAttendance);
+    }
   } catch (err) {
     console.error('Error fetching attendance:', err.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Route to fetch student names only
+router.get('/names', async (req, res) => {
+  try {
+    const students = await Student.find({}, 'name'); // Fetch only the name field
+    res.json(students);
+  } catch (err) {
+    console.error('Error fetching student names:', err.message);
     res.status(500).json({ message: 'Server error' });
   }
 });
