@@ -17,7 +17,7 @@ const Attendance = () => {
         // Initialize attendance state for each student
         const initialAttendance = {};
         response.data.forEach((student) => {
-          initialAttendance[student._id] = 'Present';
+          initialAttendance[student._id] = 'Absent';
         });
         setAttendance(initialAttendance);
        
@@ -75,7 +75,7 @@ const Attendance = () => {
                   <td>{student.class}</td>
                   <td>
                     <select
-                      value={attendance[student._id] || 'Present'}
+                      value={attendance[student._id] || 'Absent'}
                       onChange={(e) =>
                         handleAttendanceChange(student._id, e.target.value)
                       }
